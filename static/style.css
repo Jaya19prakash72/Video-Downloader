@@ -1,0 +1,95 @@
+:root {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #172033;
+    background: #f4f7fb;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef4ff, #f8fafc);
+}
+.background {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 12% 12%, rgba(37,99,235,.12), transparent 28%),
+        radial-gradient(circle at 88% 82%, rgba(124,58,237,.10), transparent 30%);
+    pointer-events: none;
+}
+.container {
+    width: min(900px, 92%);
+    margin: 0 auto;
+    padding: 55px 0 30px;
+    position: relative;
+}
+.hero { display: flex; align-items: center; gap: 18px; margin-bottom: 25px; }
+.logo {
+    width: 62px; height: 62px; display: grid; place-items: center;
+    border-radius: 18px; background: #172554; color: white;
+    font-size: 29px; box-shadow: 0 14px 30px rgba(23,37,84,.20);
+}
+h1 { margin: 0; font-size: clamp(29px, 5vw, 44px); letter-spacing: -1.5px; }
+.hero p { margin: 7px 0 0; color: #64748b; }
+.platforms {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px;
+}
+.platform {
+    margin: 0; padding: 13px; border: 1px solid #dbe3ed; border-radius: 13px;
+    background: white; color: #334155; font-weight: 700; cursor: pointer;
+}
+.platform span { margin-right: 6px; }
+.platform.active { background: #172554; color: white; border-color: #172554; }
+.card {
+    background: rgba(255,255,255,.97); border: 1px solid #e1e8f0;
+    border-radius: 24px; padding: 34px; box-shadow: 0 24px 70px rgba(30,41,59,.10);
+}
+.selected-platform {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 23px;
+}
+#platformBadge {
+    background: #dbeafe; color: #1d4ed8; padding: 6px 10px;
+    border-radius: 999px; font-weight: 800; font-size: 12px;
+}
+#platformHelp { color: #64748b; font-size: 13px; }
+label { display: block; font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 8px; }
+input, select {
+    width: 100%; border: 1px solid #cbd5e1; background: #f8fafc;
+    border-radius: 12px; padding: 14px; font: inherit; outline: none;
+}
+input:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,.10); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+#downloadBtn {
+    width: 100%; border: 0; border-radius: 12px; padding: 15px; margin-top: 24px;
+    background: #2563eb; color: white; font-weight: 800; font-size: 15px; cursor: pointer;
+}
+#downloadBtn:hover { background: #1d4ed8; }
+#downloadBtn:disabled { opacity: .65; cursor: not-allowed; }
+.progress-section { margin-top: 28px; }
+.status-row { display: flex; justify-content: space-between; color: #64748b; font-size: 13px; margin-bottom: 8px; }
+.progress-track { height: 14px; background: #e5eaf2; border-radius: 999px; overflow: hidden; }
+.progress {
+    height: 100%; width: 0; background: linear-gradient(90deg, #2563eb, #4f46e5);
+    border-radius: inherit; transition: width .25s;
+}
+.message { margin-top: 18px; padding: 13px 15px; border-radius: 12px; font-size: 14px; }
+.message.success { background: #ecfdf5; color: #047857; }
+.message.error { background: #fef2f2; color: #b91c1c; }
+.download-link {
+    display: block; text-align: center; margin-top: 14px; padding: 13px;
+    border-radius: 12px; background: #0f766e; color: white;
+    text-decoration: none; font-weight: 700;
+}
+.hidden { display: none !important; }
+.notice { text-align: center; color: #64748b; font-size: 13px; margin-top: 18px; }
+@media (max-width: 650px) {
+    .container { padding-top: 30px; }
+    .card { padding: 22px; }
+    .grid, .platforms { grid-template-columns: 1fr; }
+    .selected-platform { align-items: flex-start; flex-direction: column; }
+}
+
+
+/* Production UI additions */
+.download-link { display:block; text-align:center; margin-top:18px; }
+button:disabled { opacity:.65; cursor:not-allowed; }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Download supported public media from YouTube, Instagram and Facebook.">
+<title>Social Video Downloader</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="background"></div>
+<main class="container">
+<section class="hero"><div class="logo">↓</div><div><h1>Social Video Downloader</h1><p>Download supported public media from popular platforms.</p></div></section>
+<section class="platforms">
+<button class="platform active" data-platform="YouTube" onclick="selectPlatform(this)"><span>▶</span> YouTube</button>
+<button class="platform" data-platform="Facebook" onclick="selectPlatform(this)"><span>f</span> Facebook</button>
+<button class="platform" data-platform="Instagram" onclick="selectPlatform(this)"><span>◎</span> Instagram</button>
+</section>
+<section class="card">
+<div class="selected-platform"><span id="platformBadge">YouTube</span><span id="platformHelp">Paste a supported public video URL below.</span></div>
+<label for="url">Video URL</label>
+<input id="url" type="url" maxlength="2048" placeholder="Paste your YouTube URL here" autocomplete="off" spellcheck="false">
+<div class="grid">
+<div><label for="type">Download Type</label><select id="type"><option value="video">Video (MP4)</option><option value="audio">Audio (MP3)</option></select></div>
+<div><label for="quality">Video Quality</label><select id="quality"><option value="best">Best Quality</option><option value="1080">1080p</option><option value="720">720p</option><option value="480">480p</option><option value="360">360p</option></select></div>
+</div>
+<button id="downloadBtn" onclick="startDownload()">DOWNLOAD</button>
+<div class="progress-section"><div class="status-row"><span id="status">Ready to download</span><span id="percent">0%</span></div><div class="progress-track"><div id="progress" class="progress"></div></div></div>
+<div id="message" class="message hidden" role="status"></div>
+<a id="downloadLink" class="download-link hidden" download>DOWNLOAD FILE</a>
+</section>
+<p class="notice">Use only with content you are authorized to download. Private/login-only content is not supported.</p>
+</main>
+<script>
+let selectedPlatform = "YouTube";
+const urlInput=document.getElementById("url"), typeSelect=document.getElementById("type"), qualitySelect=document.getElementById("quality");
+function selectPlatform(button){document.querySelectorAll(".platform").forEach(b=>b.classList.remove("active"));button.classList.add("active");selectedPlatform=button.dataset.platform;document.getElementById("platformBadge").textContent=selectedPlatform;const placeholders={YouTube:"Paste your YouTube URL here",Facebook:"Paste a public Facebook video URL here",Instagram:"Paste a public Instagram video/reel URL here"};urlInput.placeholder=placeholders[selectedPlatform];urlInput.value="";hideMessage();setProgress(0,"Ready to download");}
+typeSelect.addEventListener("change",()=>{qualitySelect.disabled=typeSelect.value==="audio";});
+async function startDownload(){const url=urlInput.value.trim(),type=typeSelect.value,quality=qualitySelect.value,button=document.getElementById("downloadBtn");if(!url){showMessage("Please enter a URL.","error");return;}button.disabled=true;button.textContent="STARTING...";hideMessage();document.getElementById("downloadLink").classList.add("hidden");setProgress(0,"Starting download...");try{const response=await fetch("/api/download",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({url,type,quality})});const data=await response.json().catch(()=>({error:"Server returned an invalid response."}));if(!response.ok)throw new Error(data.error||`Server error: ${response.status}`);if(!data.job_id)throw new Error("Server did not return a job ID.");pollStatus(data.job_id);}catch(error){showMessage("Download could not be started: "+error.message,"error");resetButton();}}
+async function pollStatus(jobId){try{const response=await fetch(`/api/status/${encodeURIComponent(jobId)}`,{headers:{Accept:"application/json"},cache:"no-store"});const job=await response.json().catch(()=>({error:"Invalid status response."}));if(!response.ok)throw new Error(job.error||`Status API error: ${response.status}`);const progress=Number(job.progress)||0;setProgress(progress,job.status||"Working...");if(job.status==="Completed"){if(!job.filename||!job.download_url)throw new Error("Download completed but no file link was returned.");const link=document.getElementById("downloadLink");link.href=job.download_url;link.setAttribute("download",job.filename);link.classList.remove("hidden");showMessage("Download completed successfully. Click the button below to save the file.","success");setProgress(100,"Completed");resetButton();return;}if(job.status==="Failed"){showMessage(job.error||"Download failed. Please try another public URL.","error");resetButton();return;}setTimeout(()=>pollStatus(jobId),1500);}catch(error){showMessage("Could not read download status: "+error.message,"error");resetButton();}}
+function setProgress(value,status){value=Math.max(0,Math.min(100,Number(value)||0));document.getElementById("progress").style.width=`${value}%`;document.getElementById("percent").textContent=`${Math.round(value)}%`;document.getElementById("status").textContent=status||"Working...";}
+function resetButton(){const button=document.getElementById("downloadBtn");button.disabled=false;button.textContent="DOWNLOAD";}
+function showMessage(text,type){const box=document.getElementById("message");box.textContent=text;box.className=`message ${type}`;}
+function hideMessage(){document.getElementById("message").className="message hidden";}
+urlInput.addEventListener("keydown",event=>{if(event.key==="Enter")startDownload();});
+</script>
+</body>
+</html>

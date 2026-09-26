@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: social-video-downloader
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: bash start.sh
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: FILE_EXPIRY_SECONDS
+        value: "1800"
+      - key: JOB_EXPIRY_SECONDS
+        value: "3600"
+      - key: MAX_CONCURRENT_DOWNLOADS
+        value: "2"
